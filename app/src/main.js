@@ -26,17 +26,68 @@ define(function(require,exports,module){
 
    var mainContext = Engine.createContext();
 
-    var surface = new Surface({
-    	content: '<center><p>CuteReports</p></center>',
-    	properties: {
-    		fontSize: '3.5em',
-    		marginTop: '5em'
-    	}
-    })
+   var titleSize = new Transitionable([undefined,100])
+   var titleAlign = new Transitionable([0,.4])
+   var TRANSITION = {duration:1000,curve:Easing.outElastic}
 
-    var surfaceMod = new Modifier({
-    	origin: [.5,.5],
-    	align: [.5,.5]
-    })
-    mainContext.add(surfaceMod).add(surface)
+   var titleSurface = new Surface({
+   		content: 'Cute Reports',
+   		properties: {
+   			backgroundColor: 'black',
+   			color: '#eee',
+    		fontSize: '3.5em',
+    		lineHeight: '2em'
+
+   		}
+   })
+   var titleSurfaceMod = new Modifier({
+   		size: function(){
+   			return titleSize.get()
+   		},
+   		align: function(){
+   			return titleAlign.get()
+   		},
+   		transform: 0
+   })
+
+   var rotated = false;
+   titleSurface.on('mouseenter', function(){
+   	  //add check here to avoid doing this twice
+   	  if(!rotated){
+   	  	expand();
+   	  }
+   	  
+   })
+   function expand(){
+   	rotated = true;
+   	titleSize.set([undefined,250],TRANSITION)
+   	titleSurface.setContent('Login to get started')
+   	var button = new Surface({
+   		content: '<button>Login</button>',
+   		properties:{
+   			fontSize:'2em'
+   		}
+   	})
+   	var buttonMod = new Modifier({
+   		align: [0,.6]
+   	})
+   	button.on('click',function(){
+   		//vanish text
+   		//vanish button
+   		//rotate bar 180
+   		//expand bar to width of page
+   		//add new view
+   		console.log('uhhh, coming soon?')
+   		titleSurfaceMod.setTransform(Transform.rotateZ(1.572),{curve:'linear',duration:500})
+   		titleAlign.set([.5,0],{curve:'linear'},function(){
+   			titleSurface.setContent('')
+   			titleSize.set(mainContext.getSize(),{curve:'linear'})
+   			button.render = function(){return null;}
+   			
+   		})
+   	})
+   	return mainContext.add(buttonMod).add(button)
+   }
+
+    mainContext.add(titleSurfaceMod).add(titleSurface)
 })
